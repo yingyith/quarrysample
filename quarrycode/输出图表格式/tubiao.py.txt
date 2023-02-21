@@ -1,0 +1,37 @@
+def draw_sheet(sheet,df,x,y):
+    sheet.row_dimensions[x].height = 35
+    for i in range(df.shape[1]):
+        if i == 0:
+            sheet.column_dimensions[chr(y+64)].width = 27
+        else:
+            sheet.column_dimensions[chr(y+i+64)].width = 13.9
+    
+    for i in range(df.shape[0]+1):
+        for j in range(df.shape[1]):
+            if i == 0:
+                sheet.cell(x+i,y+j).style = style_title
+                sheet.cell(x+i,y+j).value = df.columns.values[j]
+            elif i == df.shape[0]:
+                sheet.cell(x+i,y+j).style = style_total
+                sheet.cell(x+i,y+j).value = df.iloc[df.shape[0]-1,j]
+            else:
+                sheet.cell(x+i,y+j).style = style_value
+                sheet.cell(x+i,y+j).value = df.iloc[i-1,j]
+
+
+def set_dic():
+    dic = {"st1":{"name":"sheet1","df1":df1_1,"df2":df1_2},
+            "st2":{"name":"sheet2","df1":df2_1,"df2":df2_2},
+            "st3":{"name":"sheet3","df1":df3_1,"df2":df3_2}}
+    return dic
+
+def make_excel_plus():
+    wb = Workbook()
+    mydic = set_dic()
+    for item in mydic:
+        mydic[item]["sheet"] = wb.create_sheet(mydic[item]["name"])
+        init_sheet(mydic[item]["sheet"])
+    for item in mydic:
+        draw_sheet( mydic[item]["sheet"],mydic[item]["df1"],4,2)
+        draw_sheet( mydic[item]["sheet"],mydic[item]["df2"],4+mydic[item]["df1"].shape[0]+2,2)
+    wb.save("openpyxl_plus.xlsx")
